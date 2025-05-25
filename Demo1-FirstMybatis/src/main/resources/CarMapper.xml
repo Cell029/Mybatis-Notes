@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="car">
+
+    <insert id="insertCarByPOJO">
+        <!--#{} 里写的是POJO的属性名-->
+        insert into t_car(car_num,brand,guide_price,produce_time,car_type) values(#{carNum},#{brand},#{guidePrice},#{produceTime},#{carType})
+    </insert>
+
+    <delete id="deleteByCarNum">
+        delete from t_car where car_num = #{xx}
+    </delete>
+
+    <update id="updateCarByPOJO">
+        update t_car set
+                         car_num = #{carNum}, brand = #{brand},
+                         guide_price = #{guidePrice}, produce_time = #{produceTime},
+                         car_type = #{carType}
+        where id = #{id}
+    </update>
+
+    <select id="selectCarById" resultType="com.cell.pojo.Car">
+        select * from t_car where id = #{id}
+    </select>
+
+    d
+</mapper>
+
