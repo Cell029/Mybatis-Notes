@@ -801,6 +801,34 @@ jdbc.password=123
 ```
 
 ****
+## 五. 手写 MyBatis 框架（掌握原理）
+
+### 1. dom4j 解析 XML 文件
+
+第一步：引入 dom4j 和 jaxen 的依赖
+
+```xml
+<!--dom4j依赖-->
+<dependency>
+    <groupId>org.dom4j</groupId>
+    <artifactId>dom4j</artifactId>
+    <version>2.1.3</version>
+</dependency>
+
+<!--jaxen依赖-->
+<dependency>
+<groupId>jaxen</groupId>
+<artifactId>jaxen</artifactId>
+<version>1.2.0</version>
+</dependency>
+```
+
+第二步:配置配置文件
+
+第三步:解析 mybatis-config.xml 文件:[ParseXmlByDomej.java](./Demo4-Mybatis_parseXml/src/main/java/com/cell/test/ParseXmlByDome4j.java)
+
+
+
 
 
 
