@@ -2,9 +2,9 @@
 
 ## 项目列表
 
-#### 1.**Demo1-FirstMybatis**：MyBatis 入门示例，配置和基础代码。
+#### 1.**Demo1-FirstMybatis**：MyBatis 入门示例，配置和基础代码：[MyBatisIntroductionTest.java](./Demo1-FirstMybatis/src/main/java/com/cell/test/MyBatisIntroductionTest.java)
 
-##### 2. **Demo2-Mybatis_CRUD**：MyBatis 的增删改查操作演示。
+##### 2. **Demo2-Mybatis_CRUD**：MyBatis 的增删改查操作演示：[CRUD.package](./Demo2-Mybatis_CRUD/src/main/java/com/cell/test)
 
 ## 一、MyBatis 入门程序
 
