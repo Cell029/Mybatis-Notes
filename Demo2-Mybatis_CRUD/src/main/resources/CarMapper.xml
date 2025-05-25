@@ -30,7 +30,7 @@
     </select>
 
     <select id="selectCarAll" resultType="com.cell.pojo.Car">
-        select * from t_car where id = #{id}
+        select * from t_car
     </select>
 </mapper>
 

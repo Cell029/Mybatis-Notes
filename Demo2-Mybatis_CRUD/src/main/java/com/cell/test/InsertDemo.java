@@ -4,11 +4,6 @@ import com.cell.pojo.Car;
 import com.cell.utils.SqlSessionUtil;
 import org.apache.ibatis.session.SqlSession;
 
-/**
- * 功能：
- * 作者：Cell
- * 日期：2025/5/24 20:47
- */
 public class InsertDemo {
     public static void main(String[] args) {
        /* // 准备数据

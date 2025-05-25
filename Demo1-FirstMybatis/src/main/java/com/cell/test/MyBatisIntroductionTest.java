@@ -5,12 +5,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
-
-/**
- * 功能：
- * 作者：Cell
- * 日期：2025/5/24 17:01
- */
 public class MyBatisIntroductionTest {
     public static void main(String[] args) {
         SqlSession sqlSession = null;

@@ -3,11 +3,6 @@ package com.cell.test;
 import com.cell.utils.SqlSessionUtil;
 import org.apache.ibatis.session.SqlSession;
 
-/**
- * 功能：
- * 作者：Cell
- * 日期：2025/5/24 21:50
- */
 public class DeleteDemo {
     public static void main(String[] args) {
         // 获取SqlSession对象

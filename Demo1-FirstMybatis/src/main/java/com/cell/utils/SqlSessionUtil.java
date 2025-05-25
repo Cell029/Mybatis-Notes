@@ -7,11 +7,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import java.io.IOException;
 
-/**
- * 功能：
- * 作者：Cell
- * 日期：2025/5/24 20:16
- */
 public class SqlSessionUtil {
     /*
      * 类加载时初始化 sqlSessionFactory 对象

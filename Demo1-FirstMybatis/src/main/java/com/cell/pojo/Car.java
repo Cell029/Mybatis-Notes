@@ -1,10 +1,6 @@
 package com.cell.pojo;
 
-/**
- * 功能：
- * 作者：Cell
- * 日期：2025/5/24 21:12
- */
+
 public class Car {
     private Long id;
     private String carNum;

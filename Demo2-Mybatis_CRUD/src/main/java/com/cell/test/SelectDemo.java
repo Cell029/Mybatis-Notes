@@ -5,11 +5,6 @@ import org.apache.ibatis.session.SqlSession;
 
 import java.util.List;
 
-/**
- * 功能：
- * 作者：Cell
- * 日期：2025/5/24 22:09
- */
 public class SelectDemo {
     public static void main(String[] args) {
         /*SqlSession sqlSession = SqlSessionUtil.openSession();
@@ -18,7 +13,7 @@ public class SelectDemo {
         System.out.println(car);*/
 
         SqlSession sqlSession = SqlSessionUtil.openSession();
-        List<Object> cars = sqlSession.selectList("selectCarAll");
+        List<Object> cars = sqlSession.selectList("car.selectCarAll");
         cars.forEach(car -> System.out.println(car));
     }
 }
