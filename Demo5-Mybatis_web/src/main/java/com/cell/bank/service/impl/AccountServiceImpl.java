@@ -6,11 +6,20 @@ import com.cell.bank.exception.AppException;
 import com.cell.bank.exception.MoneyNotEnoughException;
 import com.cell.bank.pojo.Account;
 import com.cell.bank.service.AccountService;
+import com.cell.bank.utils.GenerateDaoProxy;
 import com.cell.bank.utils.SqlSessionUtil;
 import org.apache.ibatis.session.SqlSession;
 
 public class AccountServiceImpl implements AccountService {
-    private AccountDao accountDao = new AccountDaoImpl();
+    // private AccountDao accountDao = new AccountDaoImpl();
+
+    // 自己封装的 dao 代理
+    // private AccountDao accountDao = (AccountDao) GenerateDaoProxy.getMapper(SqlSessionUtil.openSession(), AccountDao.class);
+
+    // mybatis 提供了相关机制也可以动态生成 dao 接口的实现类
+    // 使用前提:sqlMapper.xml 的 namespace 必须是接口的全限定名, sqlId 必须是接口中的方法名
+    private AccountDao accountDao = SqlSessionUtil.openSession().getMapper(AccountDao.class);
+
     @Override
     public void transfer(String fromActno, String toActno, double money) throws MoneyNotEnoughException, AppException {
         SqlSession sqlSession = SqlSessionUtil.openSession();
@@ -27,8 +36,8 @@ public class AccountServiceImpl implements AccountService {
             toAct.setBalance(toAct.getBalance() + money);
 
             // 模拟异常
-            String s = null;
-            s.toString();
+            /*String s = null;
+            s.toString();*/
 
             // 更新数据库
             accountDao.update(fromAct);

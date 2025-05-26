@@ -1057,5 +1057,19 @@ Thread[#1,main,5,main]-UserDao
 添加 ThreadLocal 后的完整代码:[bank](./Demo5-Mybatis_web/src/main/java/com/cell/bank)
 
 ---
+## 七. 使用 Javassist 生成 DaoImpl 类
+
+手动封装一个简易的代理机制:[GenerateDaoProxy.java](./Demo5-Mybatis_web/src/main/java/com/cell/bank/utils/GenerateDaoProxy.java)
+
+总结:这个例子很好的解释了为什么 sqlMapper.xml 文件中的 namespace 强制要求写接口的全限定名,否则会有警告提示,就是为了底层的反射机制可以找到这个接口,然后自动生成对应的实现类,
+以及 sqlMapper.xml 中的 sqlId 为什么要与接口中的方法名同名,不过方法中的参数没有强制规定,因为反射时会动态地使用参数名
+
+```text
+ <select id="selectByActno" resultType="com.cell.bank.pojo.Account">
+ Account selectByActno(String actno);
+```
+
+****
+
 
 

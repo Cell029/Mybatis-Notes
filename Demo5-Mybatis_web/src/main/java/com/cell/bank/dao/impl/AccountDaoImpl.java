@@ -10,14 +10,12 @@ public class AccountDaoImpl implements AccountDao {
     public Account selectByActno(String actno) {
         // 与 service 层中获取的 sqlSession 为同一个
         SqlSession sqlSession = SqlSessionUtil.openSession();
-        Account act = (Account)sqlSession.selectOne("selectByActno", actno);
-        return act;
+        return (Account)sqlSession.selectOne("selectByActno", actno);
     }
 
     @Override
     public int update(Account act) {
         SqlSession sqlSession = SqlSessionUtil.openSession();
-        int count = sqlSession.update("update", act);
-        return count;
+        return sqlSession.update("update", act);
     }
 }
