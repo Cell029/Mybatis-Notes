@@ -1043,7 +1043,7 @@ Thread[#1,main,5,main]-UserDao
 比如 ThreadLocal、事务、日志 traceId、Session 都需要在一个线程中完整执行,
 同时可以避免频繁创建销毁线程,提高效率
 
-> 所以依赖这种计数可以实现事务的管理(JDBC 中 `Connection` 对象管理事务的提交, Mybatis 中 `SqlSession` 对象管理事务的提交)
+> 所以依赖这种技术可以实现事务的管理(JDBC 中 `Connection` 对象管理事务的提交, Mybatis 中 `SqlSession` 对象管理事务的提交)
 
 所以可以使用 Map 集合进行统一管理, key 绑定当前请求的线程, value 绑定 `Connection` 或 `SqlSession`,当获取到绑定的线程时,
 就将 `Connection` 或 `SqlSession` 取出,保证每一次操作时使用的是同一个对象,即保证每次的操作都是同一个事务在管理资源,避免多次传递 `Connection` 或 `SqlSession`
@@ -1070,6 +1070,13 @@ Thread[#1,main,5,main]-UserDao
 ```
 
 ****
+基于以上内容,现在可以以面向接口的方式再进行一次 CRUD:[CarMapperTest.java](./Demo5-Mybatis_web/src/main/java/com/cell/crudByInterface/test/CarMapperTest.java)
+
+****
+## 八. Mybatis 小技巧
+
+### 1. #{} 和 ${} 的区别
+
 
 
 
