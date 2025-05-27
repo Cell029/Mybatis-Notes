@@ -1305,6 +1305,37 @@ Parameter 'name' not found. Available parameters are [arg1, arg0, param1, param2
 List<Student> selectByNameAndAge(@Param(value="name") String name, @Param("age") int age);
 ```
 ****
+## 十. 查询语句专题
+[CarMapperTest.java](./Demo5-Mybatis_web/src/main/java/com/cell/select/test/CarMapperTest.java)
+### 1. 返回 Map 
+
+当返回的数据没有合适的实体类对应的话，可以采用Map集合接收。字段名做 key，字段值做 value.查询如果可以保证只有一条数据，则返回一个Map集合即可
+
+****
+### 2. 返回多个 Map
+
+查询结果条数大于等于 1 条数据，则可以返回一个存储 Map 集合的 List 集合,例如 List<Map> 等同于 List<Car>,即一个 Map 对应一个 pojo
+
+****
+### 3. 返回大 Map
+
+采用上一个 List 包含 Map 的方式有个弊端,就是想要获取 Map 中某个 key 的那个 Map 就很麻烦,
+所以可以采用 Map 套 Map 的方式,用某个字段作为外层 Map 的 key (例如使用主键 id,通过 @MapKey("id") 来使用)
+
+****
+### 4. 结果映射
+
+查询结果的列名和java对象的属性名对应不上怎么办？
+
+- 第一种方式：as 给列起别名
+- 第二种方式：使用 resultMap 进行结果映射:[CarMapper.xml](./Demo5-Mybatis_web/src/main/resources/com/cell/select/mapper/CarMapper.xml)
+- 第三种方式：是否开启驼峰命名自动映射（配置settings）
+
+****
+
+
+
+
 
 
 

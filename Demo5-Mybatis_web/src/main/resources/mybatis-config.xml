@@ -29,5 +29,6 @@
         <!--<mapper class="com.cell.crudByInterface.mapper.CarMapper"/>-->
         <package name="com.cell.crudByInterface.mapper"/>
         <package name="com.cell.param.mapper"/>
+        <package name="com.cell.select.mapper"/>
     </mappers>
 </configuration>
