@@ -1075,7 +1075,174 @@ Thread[#1,main,5,main]-UserDao
 ****
 ## 八. Mybatis 小技巧
 
-### 1. #{} 和 ${} 的区别
+### 1. #{} 和 ${}
+
+#{} 占位符（预编译占位符）:
+
+是用来传递参数值的(具体以传递的值的类型有关), MyBatis 会将 #{} 解析为 JDBC 的 `?` 占位符,并在 SQL 执行前通过 PreparedStatement 进行参数绑定
+
+```sql
+SELECT * FROM users WHERE id = #{id};
+-- 等价于
+SELECT * FROM users WHERE id = ?;
+-- SELECT * FROM users WHERE id = 5;
+```
+
+如果传递的参数是字符串类型的话,就会自动拼接上 `''`
+
+${} 占位符（字符串拼接占位符）:
+
+MyBatis 会将 ${} 直接替换成传入的值，没有使用参数绑定，属于动态 SQL 拼接
+
+```sql
+SELECT * FROM ${tableName} WHERE id = ${id};
+-- 如果传递 5 OR 1=1 
+SELECT * FROM users WHERE id = 5 OR 1=1
+-- 此时直接进行了拼接,就导致 SQL 注入问题
+```
+
+注意:
+
+- ${} 不要用来传值，只用来拼结构
+
+- 动态拼接字段时，如果不能避免 ${}，要严格校验传入参数是否合法
+
+- #{} 可以安全传递各种类型：数字、字符串、日期、布尔等,但不是很适用于动态拼接
+
+- 不要在 where 语句或值传递场景中误用 ${}，会带来 SQL 注入风险
+
+****
+### 2. 批量删除
+
+可以利用 ${} 的动态拼接的特性来实现批量删除,例如传递一个字符串 "156,157,158"
+
+```sql
+delete from t_car where id in(${ids});
+-- 等价于
+delete from t_car where id in(156,157,158); 
+```
+
+****
+### 3. 模糊查询
+
+sql 语句的模糊查询是这样的: like '%XXX%',如果用 #{} 来动态查询的话是会报错的,因为 #{} 会被识别为 ? ,而 ? 在 '' 中会被识别为普通的字符串
+
+1. 使用 '%${XXX}%'
+2. 使用 concat 函数,实现字符串的拼接: concat('%', #{}, '%')
+3. "%"#{}"%" -> "%"?"%",需要注意的是不能使用 '%'#{}'%',SQL 字符串本身需要用单引号 ' 包裹，而 MyBatis 的 #{} 占位符解析时会尝试保留单引号，导致语法错误
+例如:
+
+```sql
+SELECT * FROM t_car WHERE brand LIKE '%'丰田'%'
+```
+
+****
+### 4. typeAliases 标签起别名
+
+起别名后就可以在 sqlMapper.xml 文件的 resultType 中使用别名,不用再写全限定类名了,但 namespace 不适用
+
+[mybatis-config.xml](./Demo5-Mybatis_web/src/main/resources/mybatis-config.xml)
+
+1. typeAlias
+
+```xml
+<typeAliases>
+  <typeAlias type="com.cell.bank.pojo.Car" alias="Car"/>
+</typeAliases>
+```
+
+typeAliases 标签中的 typeAlias 可以写多个,type 属性：指定给哪个类起别名; alias属性：别名.
+
+2. package
+
+如果一个包下的类太多，每个类都要起别名，会导致 typeAlias 标签配置较多，所以 mybatis 用提供 package 的配置方式，
+只需要指定包名，该包下的所有类都自动起别名，别名就是简类名,并且别名不区分大小写
+
+```xml
+<typeAliases>
+  <package name="com.cell.bank.pojo"/>
+</typeAliases>
+```
+
+****
+### 5. mappers 标签
+
+在 MyBatis 中，<mapper> 标签用于定义与一个接口（Mapper 接口）绑定的 SQL 映射语句:[mybatis-config.xml](./Demo5-Mybatis_web/src/main/resources/mybatis-config.xml)
+
+1. <mapper resource=""/>
+
+从类路径（classpath）根目录开始查找,也就是从 resources/ 目录的根开始定位,当 sqlMapper.xml 文件放在 resources 中时可以使用
+
+```css
+src/
+ └── main/
+      └── resources/
+           └── mappers/
+                └── sqlMapper.xml
+```
+
+2. <mapper url=""/>
+
+从本地文件开始查找:file:// 绝对路径
+
+```xml
+<mapper url="file:///D:/mybatis/mappers/sqlMapper.xml"/>
+```
+
+3. <mapper class="全限定类名"/>:用来告诉 MyBatis 通过接口类的全路径来加载 Mapper
+
+使用这种方式的前提是 sqlMapper.xml 文件的位置不能随便放,必须和对应的 Mapper 接口"放在一起",也就是在 resources 中创建和 Mapper 接口一样的路径(用 '/' 代替 '.'),
+Java 项目构建时,资源文件（resources 目录下的文件）会被按相同的包路径结构复制到输出目录（如 target/classes）,而 Java 类编译后的 .class 文件也会按照包路径放置在同一输出目录,
+这样做方便运行时按包路径查找资源，MyBatis 在运行时通过类路径加载 XML 文件时，能直接定位到对应路径
+
+4. <package name="com.cell.crudByInterface.mapper"/>
+
+当一个包下有多个接口时,就需要对应多个 sqlMapper.xml 文件,就可以使用这种方式管理所有的 sqlMapper.xml 文件
+
+****
+### 6. 配置模板文件
+
+打开 settings 中的 editor,找到 File and Code Templates:(File | Settings | Editor | File and Code Templates),添加相应的文件即可
+
+****
+### 7. 插入数据时获取自动生成的主键
+
+在 sql 标签后面加上 useGeneratedKeys 和 keyProperty:
+
+```xml
+<insert id="insertCar" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO t_car (name, price, brand)
+    VALUES (#{name}, #{price}, #{brand})
+</insert>
+```
+
+- `useGeneratedKeys="true"`:它会在执行完 insert 语句之后获取数据库自动生成的主键值
+-  `keyProperty="id"`:把数据库生成的主键值，赋值回参数对象中的字段,即等号后面的字段
+
+****
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

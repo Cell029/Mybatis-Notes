@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.cell.bank.dao.AccountDao">
-    <select id="selectByActno" resultType="com.cell.bank.pojo.Account">
+    <select id="selectByActno" resultType="Account">
         select * from t_act where actno = #{actno}
     </select>
     <update id="update">

@@ -7,6 +7,10 @@
     <settings>
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
+    <typeAliases>
+        <typeAlias type="com.cell.bank.pojo.Account" alias="Account"/>
+        <typeAlias type="com.cell.crudByInterface.pojo.Car" alias="Car"/>
+    </typeAliases>
     <environments default="dev">
         <environment id="dev">
             <transactionManager type="JDBC"/>
@@ -20,6 +24,8 @@
     </environments>
     <mappers>
         <mapper resource="AccountMapper.xml"/>
-        <mapper resource="CarMapper.xml"/>
+        <!--<mapper resource="CarMapper.xml"/>-->
+        <!--<mapper class="com.cell.crudByInterface.mapper.CarMapper"/>-->
+        <package name="com.cell.crudByInterface.mapper"/>
     </mappers>
 </configuration>
