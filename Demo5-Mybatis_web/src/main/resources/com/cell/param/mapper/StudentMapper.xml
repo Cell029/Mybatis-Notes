@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.cell.param.mapper.StudentMapper">
+
+    <select id="selectByNameAndSex" resultType="Student">
+        <!--select * from t_student where name = #{name} and sex = #{sex}-->
+        select * from t_student where name = #{arg0} and sex = #{arg1}
+    </select>
+
+    <select id="selectByNameAndAge" resultType="student">
+        select * from t_student where name = #{name} and age = #{age}
+    </select>
+</mapper>

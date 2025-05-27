@@ -1220,9 +1220,91 @@ Java 项目构建时,资源文件（resources 目录下的文件）会被按相�
 -  `keyProperty="id"`:把数据库生成的主键值，赋值回参数对象中的字段,即等号后面的字段
 
 ****
+## 九. Mybatis 参数处理
 
+### 1. 单个参数
 
+1. 当传入的是基本类型或字符串时，MyBatis 会自动将参数的名字设置为 param 或 arg
 
+```xml
+<!--这里的 #{id} 表达式中的 id，MyBatis 实际会解析为参数名。
+虽然传的是 int，MyBatis 默认会用 id、param 或 arg 来作为引用名-->
+<select id="selectUserById" resultType="User" parameterType="int">
+    SELECT * FROM user WHERE id = #{id}
+</select>
+```
+
+2. 如果传入的是一个 JavaBean 对象，MyBatis 会根据属性名称来解析
+
+```xml
+<!--MyBatis 会通过反射获取 user 对象中的属性，如 id 和 name，来替换 #{id} 和 #{name}-->
+<select id="selectStudent" resultType="Student" parameterType="Student">
+    SELECT * FROM t_student
+    WHERE id = #{id} AND name = #{name}
+</select>
+```
+
+****
+### 2. 多参数
+
+1. 传递 Map 参数
+
+传递 Map 参数时, sqlMapper 文件中的 sql 语句的 #{} 中应该填写和 Map 的 key 一样的内容,否则就无法获取到对应的 value,
+因为 MyBatis 在处理 Map 类型参数时，会自动把 Map 作为参数对象本身，在解析 #{} 占位符时，直接通过 key 从这个 Map 中获取对应的值,例如:
+
+```java
+Map<String, Object> paramMap = new HashMap<>();
+paramMap.put("name", "张三");
+paramMap.put("age", 18);
+// MyBatis 在执行 SQL 时会自动做类似的事情：
+String name = paramMap.get("name");
+Integer age = paramMap.get("age");
+```
+
+然后再在 sqlMapper 文件中获取值
+
+```xml
+<select id="selectByMap" resultType="Student">
+  SELECT * FROM t_student WHERE name = #{name} AND age = #{age}
+</select>
+```
+
+2. 但是如果不是传递 Map 参数,并且直接使用自己命名的参数作为接收值的话, Mybatis 就无法像单个参数一样自动识别出来,并且会抛出异常信息
+
+```java
+List<Student> students = mapper.selectByNameAndSex("张三", '女');
+```
+
+```xml
+<select id="selectByNameAndSex" resultType="Student">
+  select * from t_student where name = #{name} and sex = #{sex}
+</select>
+```
+
+```text
+Parameter 'name' not found. Available parameters are [arg1, arg0, param1, param2]
+Parameter 'name' not found. Available parameters are [arg1, arg0, param1, param2]
+```
+
+但当我根据抛出的异常信息将两个参数名设置为 arg0 和 arg1 后, Mybatis 就能识别出来了
+
+```xml
+<select id="selectByNameAndSex" resultType="Student">
+  select * from t_student where name = #{arg0} and sex = #{arg1}
+</select>
+```
+
+****
+### 3. @Param 注解
+
+所以基于 Mybatis 可以识别 Map 集合的这种特性,它提供了 @Param 注解来达到类似的效果,也就是通过把 @Param(value = ) 中的 value 作为 key,
+传递的参数作为 value 绑定,达到自定义传递参数名的效果,就不用再使用 arg0,arg1 了,提高了可读性
+
+```java
+// 使用注解后就可以在 sqlMapper 文件中使用自己定义的参数名了
+List<Student> selectByNameAndAge(@Param(value="name") String name, @Param("age") int age);
+```
+****
 
 
 

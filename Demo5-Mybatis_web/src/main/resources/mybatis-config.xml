@@ -10,6 +10,7 @@
     <typeAliases>
         <typeAlias type="com.cell.bank.pojo.Account" alias="Account"/>
         <typeAlias type="com.cell.crudByInterface.pojo.Car" alias="Car"/>
+        <typeAlias type="com.cell.param.pojo.Student" alias="Student"/>
     </typeAliases>
     <environments default="dev">
         <environment id="dev">
@@ -27,5 +28,6 @@
         <!--<mapper resource="CarMapper.xml"/>-->
         <!--<mapper class="com.cell.crudByInterface.mapper.CarMapper"/>-->
         <package name="com.cell.crudByInterface.mapper"/>
+        <package name="com.cell.param.mapper"/>
     </mappers>
 </configuration>
