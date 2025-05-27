@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cell.select.mapper.CarMapper">
+
+    <!--
+        1.专门定义一个结果映射,在这个结果映射中指定数据库表的字段名和 Java 类的属性名的对应关系
+        2.type:指定 pojo 类的类名
+        3.id:指定 resultMap 的唯一标识,这个 id 将来要在 select 标签中使用
+    -->
+    <resultMap id="carResultMap" type="com.cell.select.pojo.Car">
+        <!--property 后面填写 pojo 类的属性名-->
+        <!--column 后面填写数据库表的字段名-->
+        <id property="id" column="id"/>
+        <result property="carNum" column="car_num"/>
+        <!--当属性名和数据库列名一致时，可以省略。但建议都写上。-->
+        <!--javaType 用来指定属性类型。jdbcType 用来指定列类型。一般可以省略。-->
+        <result property="brand" column="brand" javaType="string" jdbcType="VARCHAR"/>
+        <result property="guidePrice" column="guide_price"/>
+        <result property="produceTime" column="produce_time"/>
+        <result property="carType" column="car_type"/>
+    </resultMap>
+
+    <!--resultMap属性的值必须和resultMap标签中id属性值一致。-->
+    <select id="selectAllByResultMap" resultMap="carResultMap">
+        select * from t_car
+    </select>
+
+    <select id="selectByIdRetMap" resultType="map">
+        select * from t_car where id = #{id}
+    </select>
+
+    <select id="selectAllRetListMap" resultType="map">
+        select id,car_num carNum,brand,guide_price guidePrice,produce_time produceTime,car_type carType from t_car
+    </select>
+
+    <select id="selectAllRetMap" resultType="map">
+        select id,car_num carNum,brand,guide_price guidePrice,produce_time produceTime,car_type carType from t_car
+    </select>
+
+    <select id="selectTotal" resultType="long">
+        select count(*) from t_car
+    </select>
+
+</mapper>
+
