@@ -1332,14 +1332,56 @@ List<Student> selectByNameAndAge(@Param(value="name") String name, @Param("age")
 - 第三种方式：是否开启驼峰命名自动映射（配置settings）
 
 ****
+## 十一. 动态 SQL 
 
+[CarMapper.xml](./Demo5-Mybatis_web/src/main/resources/com/cell/dynamic_sql/mapper/CarMapper.xml)
 
+### 1. if 标签
 
+`<if>` 标签属于 MyBatis 的动态 SQL 标签，用于根据参数值是否满足条件来动态生成 SQL 的一部分
 
+****
 
+ ### 2. where 标签
 
+`<where>` 标签在多个动态条件拼接的 SQL 中,自动处理 where 关键字的添加与多余逻辑运算符（如 AND、OR）的清理，简化 SQL 拼接工作
 
+****
+### 3. trim 标签
 
+`<trim>` 标签对 SQL 子句的前缀、后缀、多余的分隔符等内容进行自动裁剪和添加
+
+****
+### 4. set 标签
+
+`<set>` 标签是专门用于构建 UPDATE 语句中 SET 子句的动态 SQL 标签,它主要用于自动处理多条件更新时字段间的逗号 `,` 问题,某字段是否需要修改主要由 `<if>` 标签控制
+
+****
+### 5. choose 标签(when otherwise) 
+
+`<choose>` 标签是用于实现类似 Java 中 if...else if...else 的逻辑判断结构的标签,它常用于多个条件之间具有互斥关系的场景中,但最终只会有一个分支被选择
+
+****
+
+### 6. foreach 标签
+
+`<foreach>` 主要用于处理集合类型参数的动态 SQL 拼接，比如批量查询、批量插入、构建 in 语句等
+
+| 属性           | 说明                               |
+| ------------ | -------------------------------- |
+| `collection` | 指定遍历的集合名，通常是 List、数组、Map 等       |
+| `item`       | 每次遍历时的当前元素的变量名                   |
+| `index`      | 当前迭代元素的索引（对于 List 是下标，Map 是 key） |
+| `open`       | 循环体的前缀字符串（如 `(`）                 |
+| `separator`  | 每个元素之间的分隔符（如 `,`）                |
+| `close`      | 循环体的后缀字符串（如 `)`）                 |
+
+****
+### 7. sql 标签和 include 标签
+
+用于提取和复用 SQL 片段,当某个 sql 语句经常被使用时,就可以用 `<sql>` 标签标记,通过 `<include>` 标签使用这些片段
+
+****
 
 
 

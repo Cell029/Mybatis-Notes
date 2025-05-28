@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cell.dynamic_sql.mapper.CarMapper">
+
+    <sql id="carCols">
+        id,car_num carNum,brand,guide_price guidePrice,produce_time produceTime,car_type carType
+    </sql>
+
+    <select id="selectAllRetMap" resultType="Car">
+        select <include refid="carCols"/> from t_car
+    </select>
+
+    <select id="selectByMultiCondition" resultType="Car">
+        select * from t_car where 1 = 1 <!--where 1=1 是一个技巧，为了让后面的 and 子句拼接更加方便,防止每个 <if> 判断参数是否为空，拼接空条件导致 SQL 错误-->
+        <!--
+            1．if标签中test属性是必须的。
+            2．if标签中test属性的值是false或者true。
+            3．如果test是true，则if标签中的sql语句就会拼接。反之，则不会拼接。
+            4．test属性中可以使用的是：
+            当使用了@Param注解，那么test中要出现的是@Param注解指定的参数名。@Param（"brand")，那么这里只能使用brand
+            当没有使用@Param注解，那么test中要出现的是：param1,param2,param3 argo arg1 arg2....
+            当使用了POJ0，那么test中出现的是POJ0类的属性名。
+            5．在mybatis的动态SQL当中，不能使用&&，只能使用and。
+        -->
+        <if test="brand != null and brand != ''">
+            and brand like "%"#{brand}"%"
+        </if>
+        <if test="guidePrice != null and guidePrice != ''">
+            and guide_price >= #{guidePrice}
+        </if>
+        <if test="carType != null and carType != ''">
+            and car_type = #{carType}
+        </if>
+    </select>
+
+    <select id="selectByMultiConditionWithWhere" resultType="car">
+        select * from t_car
+        <!--
+            使用 where 标签后可以自动去除 if 中每一句前面多余的 and 和 or 标签.
+            这样就不用再和上面一样在后面加个 1 = 1.
+            但是它不能去除句子末尾的 and 和 or
+        -->
+        <where>
+            <if test="brand != null and brand != ''">
+                and brand like #{brand}"%"
+            </if>
+            <if test="guidePrice != null and guidePrice != ''">
+                and guide_price >= #{guidePrice}
+            </if>
+            <if test="carType != null and carType != ''">
+                and car_type = #{carType}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByMultiConditionWithTrim" resultType="car">
+        select * from t_car
+        <!--
+            prefix：在 trim 标签中的语句前添加内容
+            suffix：在 trim 标签中的语句后添加
+            prefixOverrides：前缀覆盖掉（去掉）
+            suffixOverrides：后缀覆盖掉（去掉）
+        -->
+        <trim prefix="where" suffixOverrides="and|or">
+            <if test="brand != null and brand != ''">
+                brand like "%"#{brand}"%" and
+            </if>
+            <if test="guidePrice != null and guidePrice != ''">
+                guide_price >= #{guidePrice} and
+            </if>
+            <if test="carType != null and carType != ''">
+                car_type = #{carType}
+            </if>
+        </trim>
+    </select>
+
+    <update id="updateWithSet">
+        update t_car
+        <set>
+            <!--不更新传来的空字段和空字符串-->
+            <if test="carNum != null and carNum != ''">car_num = #{carNum},</if>
+            <if test="brand != null and brand != ''">brand = #{brand},</if>
+            <if test="guidePrice != null and guidePrice != ''">guide_price = #{guidePrice},</if>
+            <if test="produceTime != null and produceTime != ''">produce_time = #{produceTime},</if>
+            <if test="carType != null and carType != ''">car_type = #{carType},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectWithChoose" resultType="Car">
+        select * from t_car
+        <where>
+            <choose>
+                <when test="brand != null and brand != ''">
+                    brand like "%"#{brand}"%"
+                </when>
+                <when test="guidePrice != null and guidePrice != ''">
+                    guide_price >= #{guidePrice}
+                </when>
+                <!--如果上面的都没执行,那么就会执行 otherwise 里面的内容-->
+                <otherwise>
+                    produce_time >= #{produceTime}
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <delete id="deleteBatchByForeach">
+        delete from t_car where id in
+        <!--
+            collection：指定数组或者集合
+            item：代表数组或集合中的元素
+            separator：循环之间的分隔符
+            open：foreach 循环拼接的所有 sql 语句的最前面以什么开始
+            close：foreach 循环拼接的所有 sql 语句的最后面以什么结束
+            collection="ids"第一次写这个的时候报错了，错误信息是：[array，arge]
+            这代表传入一个数组时 mybatis 底层是不能自动识别的,它与一个 Map 集合绑定了,必须要使用 @Param 注解来指定参数名
+            map.put("array",数组);
+            map.put("argo"，数组);
+        -->
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="insertBatchByForeach">
+        insert into t_car values
+        <foreach collection="cars" item="car" separator=",">
+            (null,#{car.carNum},#{car.brand},#{car.guidePrice},#{car.produceTime},#{car.carType})
+        </foreach>
+    </insert>
+
+</mapper>
+
