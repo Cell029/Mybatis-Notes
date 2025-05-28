@@ -6,6 +6,8 @@
 
 <mapper namespace="com.cell.advanced_mapping.mapper.UserMapper">
 
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+
     <resultMap id="userResultMap" type="User">
         <id property="id" column="id"/>
         <result property="username" column="username"/>

@@ -1471,6 +1471,111 @@ stus=[Student{sid=1, sname='张三', clazz=null}, Student{sid=2, sname='李四',
 多对多那就是互相把对方的表看作副表,用集合封装,作为自己的一个字段,不过需要用到一个中间表来关联它们(可以看作是两个一对多):[EmployeeMapper.xml](./Demo5-Mybatis_web/src/main/resources/com/cell/advanced_mapping/mapper/EmployeeMapper.xml)
 
 ****
+## 十三. Mybatis 的缓存
+
+mybatis 的缓存：将 select 语句的查询结果放到缓存（内存）当中，下一次还是这条 select 语句的话，直接从缓存中取，不再查数据库。
+一方面是减少了 IO,另一方面不再执行繁琐的查找算法,效率大大提升
+
+### 1. 一级缓存
+
+一级缓存是 MyBatis 默认开启 的缓存机制，它的作用范围是 SqlSession，也就是说在同一个 SqlSession 中执行相同的 SQL 查询时，如果参数也一致，第二次会直接从缓存中取结果，不会再访问数据库.
+不过一级缓存不会跨 Mapper 使用,也就是说如果使用了分步查询那么缓存就不起作用了
+
+```java
+SqlSession sqlSession = SqlSessionUtil.openSession();
+UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+User user = mapper.selectUserById(1);
+User user2 = mapper.selectUserById(1);
+System.out.println(user);
+System.out.println(user2);
+```
+
+这里就是用的相同的 Mapper,相同的 select,相同的参数,所以日志打印出的信息中只有一条 select 语句被执行了
+
+```text
+select u.id, u.username, d.id as detail_id, d.address, d.phone from user u left join user_detail d on u.id = d.user_id where u.id = ?
+Parameters: 1(Integer)
+Total: 1
+```
+
+一级缓存失效情况:
+
+- 不同的 SqlSession 对象
+- 查询条件变化了
+- 在相同的 select 语句中间执行了 insert,update,delete
+- 使用了 `sqlSession.clearCache();` 手动清除缓存
+
+****
+### 2. 二级缓存
+
+二级缓存是一个跨 SqlSession 的共享缓存机制,它的作用域是 SqlSessionFactory,只要通过同一个 SqlSessionFactory 创建的 SqlSession,
+就能共享缓存,使用时要开启全局配置,并在单独的 sqlMapper 文件中添加 `<cache>` 标签,同时对应的 pojo 类也要实现序列化接口,不过只有在 SqlSession 对象提交或关闭后,一级缓存中的数据才会存入二级缓存,
+所以一级缓存的优先级是最高的
+
+```xml
+<settings>
+    <setting name="cacheEnabled" value="true"/>
+</settings>
+```
+
+```xml
+<!--eviction 表示使用的淘汰机制,flushInterval 表示自动清除缓存时间间隔,size 表示缓存的对象数上限,readOnly 表示是否只读-->
+<cache eviction="LRU" flushInterval="60000" size="512" readOnly="false"/>
+```
+
+```text
++-----------------+
+| SqlSession A    |
+| (调用 Mapper)   |
++-----------------+
+        |
+        v
+   一级缓存 (A)
+        |
+        v
+   执行查询，存入二级缓存（Mapper 命名空间）
+
+----------------------------------------
+另一线程：
++-----------------+
+| SqlSession B    |
+| (调用 Mapper)   |
++-----------------+
+        |
+        v
+   一级缓存 (B)
+        |
+        v
+  检查 Mapper 的二级缓存 -> 命中直接返回，不查库
+```
+
+二级缓存的失效情况:
+- 在两次查询中使用了 insert,update,delete, 此时二级缓存就会失效,一级缓存也是
+
+****
+### 3. MyBatis 集成 EhCache 
+
+集成 EhCache 是为了代替 mybatis 自带的二级缓存,但一级缓存是无法替代的:
+
+第一步:引入 mybatis 整合 ehcache 的依赖
+
+```xml
+<!--mybatis集成ehcache的组件-->
+<dependency>
+  <groupId>org.mybatis.caches</groupId>
+  <artifactId>mybatis-ehcache</artifactId>
+  <version>1.2.2</version>
+</dependency>
+```
+
+第二步:在类的根路径下新建 echcache.xml 文件，并提供对应配置信息:[echcache.xml](./Demo5-Mybatis_web/src/main/resources/echcache.xml)
+
+第三步:修改 SqlMapper.xml 文件中的 `<cache/>` 标签，添加 type 属性
+
+```xml
+<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+```
+
 
 
 

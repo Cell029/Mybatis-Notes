@@ -12,6 +12,8 @@ public class UserMapperTest {
         SqlSession sqlSession = SqlSessionUtil.openSession();
         UserMapper mapper = sqlSession.getMapper(UserMapper.class);
         User user = mapper.selectUserById(1);
+        User user2 = mapper.selectUserById(1);
         System.out.println(user);
+        System.out.println(user2);
     }
 }

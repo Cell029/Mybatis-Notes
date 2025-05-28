@@ -10,6 +10,8 @@ public class StudentMapperTest {
     public void testSelectBySid(){
         StudentMapper mapper = SqlSessionUtil.openSession().getMapper(StudentMapper.class);
         Student student = mapper.selectBySid(1);
+        Student student1 = mapper.selectBySid(2);
         System.out.println(student);
+        System.out.println(student1);
     }
 }
