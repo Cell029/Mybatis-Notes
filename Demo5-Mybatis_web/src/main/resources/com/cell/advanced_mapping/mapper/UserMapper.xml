@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.cell.advanced_mapping.mapper.UserMapper">
+
+    <resultMap id="userResultMap" type="User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <association property="userDetail" javaType="UserDetail">
+            <id property="id" column="detail_id"/>
+            <result property="address" column="address"/>
+            <result property="phone" column="phone"/>
+        </association>
+    </resultMap>
+
+    <select id="selectUserById" resultMap="userResultMap">
+        select u.id, u.username,
+               d.id as detail_id, d.address, d.phone
+        from user u left join user_detail d on u.id = d.user_id
+        where u.id = #{id}
+    </select>
+
+
+</mapper>

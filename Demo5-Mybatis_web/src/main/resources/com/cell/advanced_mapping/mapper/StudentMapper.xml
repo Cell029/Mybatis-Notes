@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.cell.advanced_mapping.mapper.StudentMapper">
+    <resultMap id="studentResultMap" type="Student">
+        <id property="sid" column="sid"/>
+        <result property="sname" column="sname"/>
+
+        <!--<result property="clazz.cid" column="cid"/>
+        <result property="clazz.cname" column="cname"/>-->
+        <!--
+            association:一个 Student 对象关联一个 Clazz 对象
+            property:提供 Student 对象中的 pojo 类型的字段的字段名
+            javaType:指定要映射的 java 类型(这里就是映射为 Clazz 类型)
+        -->
+        <!--<association property="clazz" javaType="Clazz">
+            <id property="cid" column="cid"/>
+            <result property="cname" column="cname"/>
+        </association>-->
+
+        <association property="clazz"
+                     select="com.cell.advanced_mapping.mapper.ClazzMapper.selectByCid"
+                     column="cid"
+                     fetchType="lazy"/><!--开启懒加载,默认是关闭状态-->
+    </resultMap>
+
+    <select id="selectBySid" resultMap="studentResultMap">
+        select s.*, c.* from t_stu s join t_clazz c on s.cid = c.cid where sid = #{sid}
+    </select>
+
+    <select id="selectByCid" resultType="Student">
+        select * from t_stu where cid = #{cid}
+    </select>
+</mapper>

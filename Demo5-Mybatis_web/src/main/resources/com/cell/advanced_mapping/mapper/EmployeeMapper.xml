@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.cell.advanced_mapping.mapper.EmployeeMapper">
+    <resultMap id="employeeResultMap" type="Employee">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <collection property="projects" ofType="Project">
+            <id property="id" column="proj_id"/>
+            <result property="name" column="proj_name"/>
+        </collection>
+    </resultMap>
+
+    <!--添加了一个中间表 employee_project ,用来关联 employee 和 project 表的 id-->
+    <select id="selectEmployeeWithProjects" resultMap="employeeResultMap">
+        select e.id, e.name,p.id as proj_id, p.name as proj_name
+        from employee e join employee_project ep on e.id = ep.emp_id join project p on p.id = ep.proj_id
+        where e.id = #{id}
+    </select>
+
+</mapper>

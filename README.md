@@ -1382,18 +1382,95 @@ List<Student> selectByNameAndAge(@Param(value="name") String name, @Param("age")
 用于提取和复用 SQL 片段,当某个 sql 语句经常被使用时,就可以用 `<sql>` 标签标记,通过 `<include>` 标签使用这些片段
 
 ****
+## 十二. 高级映射及延迟加载
 
+### 1. 多对一
 
+多对一,多在前,证明多的那个表是主表,一的那个表是副表,副表作为主表对象的一个引用变量:[StudentMapper.xml](./Demo5-Mybatis_web/src/main/resources/com/cell/advanced_mapping/mapper/StudentMapper.xml)
 
+- 第一种方式:一条 SQL 级联映射
 
+这种方式虽然能够实现多对一的映射,但是并不推荐使用,这段 `<result property="clazz.cid" column="cid"/>` 表示 MyBatis 会尝试使用反射调用 getClazz() 获取 Clazz 对象,
+然后调用 setCid(...) 设置值.如果 getClazz() 返回的是 null（即 clazz 属性没有初始化）,就会报错或映射失败
 
+```xml
+<resultMap id="studentResultMap" type="Student">
+  <id property="sid" column="sid"/>
+  <result property="sname" column="sname"/>
+  <result property="clazz.cid" column="cid"/>
+  <result property="clazz.cname" column="cname"/>
+</resultMap>
+```
 
+- 第二种方式:一条 SQL 使用 `<association>` 标签
 
+在上面原有的基础上添加 `<association>` 进行修改即可,这种方式可以解决点语法级联赋值带来的对象为 null 的问题,但是这两种方式在使用时都需要注意一点,
+就是主对象(Student) 必须带有无参构造器,因为 mybatis 映射时只能从 ResultSet 集合中获取到原始的数据类型(Integer 和 String),它不能自动组装一个 Clazz 对象传入构造方法,
+所以只能提供无参的构造器,让它去调用 setter 和 getter 方法
 
+```xml
 
+<association property="clazz" javaType="Clazz">
+    <id property="cid" column="cid"/>
+    <result property="cname" column="cname"/>
+</association>
+```
 
+- 第三种方式:多条 SQL 使用分步查询
 
+分步查询也叫延迟加载查询,它将一次性查询拆成多个步骤,每个步骤单独查询并在真正需要时再执行(可配置全局的懒加载)
 
+```xml
+<resultMap id="studentResultMap" type="Student">
+  <id property="sid" column="sid"/>
+  <result property="sname" column="sname"/>
+  <!--将上一个查询到的结果作为参数传递给下一个将要执行的查询语句,即在对应的接口中添加相应的方法-->
+  <association property="clazz"
+               select="com.cell.advanced_mapping.mapper.ClazzMapper.selectByCid"
+               column="cid"/>
+</resultMap>
+
+<select id="selectBySid" resultMap="studentResultMap">
+    select s.* from t_student s where sid = #{sid}
+</select>
+```
+
+会先执行 `select s.*, c.* from t_stu s join t_clazz c on s.cid = c.cid where sid = ?`,然后将查到的 cid 作为条件继续查询 `select * from t_clazz where cid = ?`
+
+****
+### 2. 一对多
+
+一对多,一在前,一就是主表,多就是副表,副标以集合的形式作为主表的字段
+
+- 第一种方式:使用 `<collection>` 标签
+
+这种方式和多对一的很像,就是换了个标签,不过最终查询出的学生数据中, clazz 是等于 null 的,不能继续对学生的信息进行关联映射,不然会变成死循环
+
+```text
+stus=[Student{sid=1, sname='张三', clazz=null}, Student{sid=2, sname='李四', clazz=null}, Student{sid=3, sname='王五', clazz=null}]}
+```
+
+- 第二种方式:分步查询
+
+与一对多同理,只需要 `<collection>` 标签里的内容
+
+```xml
+<collection property="stus"
+              select="com.cell.advanced_mapping.mapper.StudentMapper.selectByCid"
+              column="cid"/>
+```
+
+****
+### 3. 一对一
+
+一对一的映射和多对一的类似:[UserMapper.xml](./Demo5-Mybatis_web/src/main/resources/com/cell/advanced_mapping/mapper/UserMapper.xml)
+
+****
+### 4. 多对多
+
+多对多那就是互相把对方的表看作副表,用集合封装,作为自己的一个字段,不过需要用到一个中间表来关联它们(可以看作是两个一对多):[EmployeeMapper.xml](./Demo5-Mybatis_web/src/main/resources/com/cell/advanced_mapping/mapper/EmployeeMapper.xml)
+
+****
 
 
 

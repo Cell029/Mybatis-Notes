@@ -6,13 +6,15 @@
     <properties resource="jdbc.properties"/>
     <settings>
         <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="lazyLoadingEnabled" value="true"/><!--开启全局的懒加载-->
     </settings>
     <typeAliases>
         <!--<typeAlias type="com.cell.bank.pojo.Account" alias="Account"/>
         <typeAlias type="com.cell.crudByInterface.pojo.Car" alias="Car"/>
         <typeAlias type="com.cell.param.pojo.Student" alias="Student"/>-->
         <!--对该包下的所有 pojo 类起别名-->
-        <package name="com.cell.dynamic_sql.pojo" />
+        <!--<package name="com.cell.dynamic_sql.pojo" />-->
+        <package name="com.cell.advanced_mapping.pojo" />
     </typeAliases>
     <environments default="dev">
         <environment id="dev">
@@ -32,6 +34,7 @@
         <!--<package name="com.cell.crudByInterface.mapper"/>
         <package name="com.cell.param.mapper"/>
         <package name="com.cell.select.mapper"/>-->
-        <package name="com.cell.dynamic_sql.mapper"/>
+        <!--<package name="com.cell.dynamic_sql.mapper"/>-->
+        <package name="com.cell.advanced_mapping.mapper"/>
     </mappers>
 </configuration>
