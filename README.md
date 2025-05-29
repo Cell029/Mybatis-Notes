@@ -1576,6 +1576,111 @@ Total: 1
 <cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
 ```
 
+****
+## 十四. Mybatis 逆向工程
+
+第一步:在 pom 中添加逆向工程插件
+
+```xml
+<!--定制构建过程-->
+<build>
+    <!--可配置多个插件-->
+    <plugins>
+        <!--其中的一个插件：mybatis逆向工程插件-->
+        <plugin>
+            <!--插件的GAV坐标-->
+            <groupId>org.mybatis.generator</groupId>
+            <artifactId>mybatis-generator-maven-plugin</artifactId>
+            <version>1.4.1</version>
+            <!--允许覆盖-->
+            <configuration>
+                <overwrite>true</overwrite>
+            </configuration>
+            <!--插件的依赖-->
+            <dependencies>
+                <!--mysql驱动依赖-->
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>8.0.30</version>
+                </dependency>
+            </dependencies>
+        </plugin>
+    </plugins>
+</build>
+```
+
+第二步:配置 generatorConfig.xml (名字必须一样,并且放在类的根路径下)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!--
+        targetRuntime有两个值：
+            MyBatis3Simple：生成的是基础版，只有基本的增删改查。
+            MyBatis3：生成的是增强版，除了基本的增删改查之外还有复杂的增删改查。
+    -->
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <!--防止生成重复代码-->
+        <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin"/>
+
+        <commentGenerator>
+            <!--是否去掉生成日期-->
+            <property name="suppressDate" value="true"/>
+            <!--是否去除注释-->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+
+        <!--连接数据库信息-->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/mybatis-notes"
+                        userId="root"
+                        password="123">
+        </jdbcConnection>
+
+        <!-- 生成pojo包名和位置 -->
+        <javaModelGenerator targetPackage="com.cell.reverse_engineering.pojo" targetProject="src/main/java">
+            <!--是否开启子包-->
+            <property name="enableSubPackages" value="true"/>
+            <!--是否去除字段名的前后空白-->
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!-- 生成SQL映射文件的包名和位置 -->
+        <sqlMapGenerator targetPackage="com.cell.reverse_engineering.mapper" targetProject="src/main/resources">
+            <!--是否开启子包-->
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <!-- 生成Mapper接口的包名和位置 -->
+        <javaClientGenerator
+                type="xmlMapper"
+                targetPackage="com.cell.reverse_engineering.mapper"
+                targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <!-- 表名和对应的实体类名-->
+        <table tableName="t_car" domainObjectName="Car"/>
+
+    </context>
+</generatorConfiguration>
+```
+
+第三步:在 idea 右侧打开 maven ,找到对应的插件,双击运行
+
+使用:[ReverseEngineeringTest.java](./Demo6-Mybatis_generate/src/main/java/com/cell/reverse_engineering/test/ReverseEngineeringTest.java)
+
+简易版就会生成对应的 pojo 类和 sqlMapper.xml ,只能实现基本的 CRUD,增强版就会多生成一个 XxxExample.java 类,用来实现复杂的 CRUD
+
+****
+
+
+
 
 
 
