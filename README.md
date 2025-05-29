@@ -879,7 +879,19 @@ jdbc.password=123
 
 第四步:解析 sqlMapper.xml 文件:[ParseSqlMapperXML.java](./Demo4-Mybatis_parseXml/src/main/java/com/cell/test/ParseSqlMapperXML.java)
 
-...
+核心代码:[core.package](./Demo4-Mybatis_parseXml/src/main/java/com/cell/core)
+
+在使用 mybatis 框架前都需要使用 SqlSessionFactoryBuilder 对象来调用它的 build 方法解析 mybatis-config 文件,然后就可以获得数据源 DataSource,事务管理器 Transaction,以及映射 SQL 文件的路径,
+接着将 SQL 语句封装成 MappedStatement,最后把 transaction, mappedStatement 传给 SqlSessionFactory 构建对象,与数据库连接
+
+SqlSessionFactory 对象的主要功能就是获取 SqlSession 对象,并把之前封装的 transaction 和 mappedStatement 传给 SqlSession 对象
+
+事务管理器需要从数据源中获取到 Connection 对象,但只有调用  Transaction.openConnection() 时,它内部才真正调用 dataSource.getConnection() 获取数据库连接,
+所以数据源和事务管理器的获取可以看作是同时发生的,不过只有有了 Transaction 才能有 DataSource,所以 SqlSessionFactoryBuilder 会先解析好 DataSource 然后传给 Transaction
+
+最后用获取到的 SqlSession 对象解析从 sqlMapper.xml 文件中解析出来的 sql 语句,然后使用 JDBC 中的方法实现 sql 语句的功能
+
+总结:Mybatis 是对 JDBC 的封装与增强,而 SqlSession 是你和数据库交互的核心接口,具体的 JDBC 操作都封装在这里
 
 ---
 
