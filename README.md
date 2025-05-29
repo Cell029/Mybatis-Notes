@@ -1736,6 +1736,34 @@ PageInfo 是一个分页结果对象,封装了分页的全部关键信息,而不
 | `getNavigatepageNums()` | 页码导航数组（如 \[1,2,3]） |
 
 ****
+## 十六. 注解式开发
+
+使用注解式开发后就不再需要在对应的 sqlMapper.xml 文件中写 sql 语句了:[CarMapper.java](./Demo6-Mybatis_generate/src/main/java/com/cell/reverse_engineering/mapper/CarMapper.java)
+
+1. @Insert(value="")
+2. @Delete("")
+3. @Update("")
+4. @Select("")
+5. @Results({@Result(column = "", property = ""),....})
+
+****
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
