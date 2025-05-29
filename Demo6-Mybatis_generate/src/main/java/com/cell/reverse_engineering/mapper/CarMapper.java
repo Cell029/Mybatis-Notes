@@ -27,4 +27,8 @@ public interface CarMapper {
     int updateByPrimaryKeySelective(Car row);
 
     int updateByPrimaryKey(Car row);
+
+    List<Car> selectByPage(@Param("startIndex") int startIndex, @Param("pageSize") int pageSize);
+
+    List<Car> selectByPageHelper();
 }

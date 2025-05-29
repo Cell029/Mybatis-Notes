@@ -225,4 +225,12 @@
       car_type = #{carType,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByPage" resultType="Car">
+    select * from t_car limit #{startIndex},#{pageSize}
+  </select>
+
+  <select id="selectByPageHelper" resultType="Car">
+    select * from t_car
+  </select>
 </mapper>

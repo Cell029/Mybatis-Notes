@@ -1678,14 +1678,64 @@ Total: 1
 简易版就会生成对应的 pojo 类和 sqlMapper.xml ,只能实现基本的 CRUD,增强版就会多生成一个 XxxExample.java 类,用来实现复杂的 CRUD
 
 ****
+## 十五. 分页查询
 
+### 1. 手动实现:[PageTest.java](./Demo6-Mybatis_generate/src/main/java/com/cell/reverse_engineering/test/PageTest.java)
 
+在使用 select 语句时添加 limit 关键字就可以实现分页查询:
 
+```sql
+select * from 表名 limit startIndex, pageSize;
+```
 
+- startIndex 是每一页的起始数据的下标(startIndex = (页数 - 1) * pageSize)
+- pageSize 是每一页最多的数据条数
 
+****
+### 2. 使用 PageHelper 插件
 
+它通过拦截器原理,在执行查询语句前自动修改 SQL,加上分页语句（如 LIMIT）,从而实现自动分页
 
+第一步:添加依赖
 
+```xml
+<dependency>
+  <groupId>com.github.pagehelper</groupId>
+  <artifactId>pagehelper</artifactId>
+  <version>5.3.2</version>
+</dependency>
+```
+
+第二步:在 mybatis-config.xml 文件中配置插件
+
+```xml
+<plugins>
+  <plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+</plugins>
+```
+
+使用:
+
+- 在查询语句之前开启分页功能
+- 在查询语句之后封装 PageInfo 对象（PageInfo 对象将来会存储到 request 域当中,在页面上展示）
+
+PageInfo 是一个分页结果对象,封装了分页的全部关键信息,而不只是当前页的数据,pageInfo 封装了以下关键信息:
+
+| 方法名                     | 含义                 |
+| ----------------------- | ------------------ |
+| `getList()`             | 当前页的数据列表           |
+| `getTotal()`            | 总记录数               |
+| `getPageNum()`          | 当前页号               |
+| `getPageSize()`         | 每页记录数              |
+| `getPages()`            | 总页数                |
+| `isHasNextPage()`       | 是否有下一页             |
+| `isHasPreviousPage()`   | 是否有上一页             |
+| `isIsFirstPage()`       | 是否是第一页             |
+| `isIsLastPage()`        | 是否是最后一页            |
+| `getNavigatePages()`    | 设置导航页码个数           |
+| `getNavigatepageNums()` | 页码导航数组（如 \[1,2,3]） |
+
+****
 
 
 
